@@ -4,10 +4,10 @@
   "description": "",
   "main": "./src/app.js",
   "scripts": {
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules NODE_ENV=testing jest --verbose",
+    "start": "node ./src/app.js", 
     "start:dev": "cross-env NODE_ENV=dev nodemon ./src/app.js",
     "start:qa": "cross-env NODE_ENV=test nodemon ./src/app.js",
-    "start:prod": "cross-env NODE_ENV=production nodemon ./src/app.js",
+    "start:prod": "cross-env NODE_ENV=production node ./src/app.js",
     "build:css": "postcss src/public/css/tailwind.css -o src/public/css/styles.css"
   },
   "keywords": [],
