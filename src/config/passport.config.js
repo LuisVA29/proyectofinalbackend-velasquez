@@ -84,7 +84,8 @@ const initializePassport = () => {
       {
         clientID: GITHUB_CLIENT_ID,
         clientSecret: GITHUB_CLIENT_SECRET,
-        callbackURL: "http://localhost:8080/api/user/github/callback",
+        callbackURL:
+          "https://proyectofinalbackend-velasquez.vercel.app/api/user/github/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
