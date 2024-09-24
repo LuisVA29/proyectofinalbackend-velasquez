@@ -1,0 +1,405 @@
+paths:
+  /api/user/login:
+    post:
+      summary: Login with email and password
+      tags:
+        - User
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: login
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+                format: email
+                description: email of user
+              password:
+                type: string
+                format: password
+                description: password of the user
+      responses:
+        "302":
+          description: Will redirect you to homepage if successfully logged and to login if fails
+  /api/user/logout:
+    get:
+      summary: Logout form current user session
+      tags:
+        - User
+      responses:
+        "302":
+          description: redirects to login
+  /api/user/register:
+    post:
+      summary: Register a user
+      tags:
+        - User
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: register
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+                format: email
+                description: email of user
+              first_name:
+                type: string
+                description: name of user
+              last_name:
+                type: string
+                description: last_name of user
+              age:
+                type: number
+                description: age of the user
+              password:
+                type: string
+                format: password
+                description: password of the user
+      responses:
+        "302":
+          description: if successfully register will redirect to login if fails redirects to register
+  /api/user/current:
+    get:
+      summary: Obtain jwt token and user info in the session
+      tags:
+        - User
+      responses:
+        "200":
+          description: return the cart of the product modi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    defualt: ok
+                    type: string
+                    description: indicate that process was successfull
+                  cookieJWT:
+                    type: string
+                  JWTPayload:
+                    $ref: '#/components/schemas/User'            
+        "401":
+          description: Acces Denied is given when there is no credentials
+  /api/user/resetpassword:
+    post:
+      summary: send a email whith the link to change the users password
+      tags:
+        - User
+      responses:
+        "200":
+          description: return the ticket of the products purchased
+          content:
+            application/json:
+              description: json containing message of successfull
+              type: object
+              properties:
+                message:
+                  type: string
+                  default: El correo fue enviado sigue las instrucciones
+        "400":
+          description: internal error
+          content:
+            application/json:
+              description: when error return status error and message of error
+              type: object
+              properties:
+                status:
+                  type: string
+                  default: error
+                message:
+                  type: string
+                  description: Error message
+  /api/user/updatepassword/{token}:
+    post:
+      summary: Recive a JWT token and change password
+      tags:
+        - User
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: jwt token sended to email when update a forgoten password
+      responses:
+        "200":
+          description: return the ticket of the products purchased
+          content:
+            application/json:
+              description: json containing message of successfull
+              type: object
+              properties:
+                message:
+                  type: string
+                  default: El correo fue enviado sigue las instrucciones
+        "400":
+          description: internal error
+          content:
+            application/json:
+              description: when error return status error and message of error
+              type: object
+              properties:
+                status:
+                  type: string
+                  default: error
+                message:
+                  type: string
+                  description: Error message
+  /api/user/{uid}/documents:
+    post:
+      summary: Upload documents for Identification, BankProof and ProofAdress
+      tags:
+        - User
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: User id
+      requestBody:
+        content: 
+          multipart/form-data: 
+            schema:            
+              type: object
+              properties:      
+                identification:            
+                  type: string
+                  format: binary
+                proofAdress:       
+                  type: string
+                  format: binary
+                bankProof:  
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: and array with all the documents uploaded
+          content:
+            application/json:
+              description: json containing teh documents uploaded
+              type: object
+              properties:
+                status:
+                  type: string
+                  default: success
+                message:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: name of what file was uploaded
+                      reference:
+                        type: string
+                        description: route where the file is located
+        "400":
+          description: internal error
+          content:
+            application/json:
+              description: when error return status error and message of error
+              type: object
+              properties:
+                status:
+                  type: string
+                  default: error
+                message:
+                  type: string
+                  description: Error message
+  /api/user/:
+    get:
+      summary: Get all users
+      tags:
+        - User
+      responses:
+        "200":
+        content:
+            application/json:
+              type: object
+              description: return an array of all users
+              properties:
+                status:
+                  type: string
+                  default: success
+                message:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/User'
+        "400":
+          description: internal error
+          content:
+            application/json:
+              description: when error return status error and message of error
+              type: object
+              properties:
+                status:
+                  type: string
+                  default: error
+                message:
+                  type: string
+                  description: Error message
+  /api/user/inactive:
+    delete:
+      summary: Delete al users that have more than 48 hours without login in
+      tags:
+        - User
+      responses:
+        "200":
+        content:
+            application/json:
+              type: object
+              description: return an array of all users deleted
+              properties:
+                status:
+                  type: string
+                  default: success
+                message:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/User'
+        "400":
+          description: internal error
+          content:
+            application/json:
+              description: when error return status error and message of error
+              type: object
+              properties:
+                status:
+                  type: string
+                  default: error
+                message:
+                  type: string
+                  description: Error message
+  /api/user/{uid}:
+    delete:
+      summary: Delete a user of the given uid
+      tags:
+        - User
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: User id that gonna be deleted
+      responses:
+        "200":
+        content:
+            application/json:
+              type: object
+              description: return an array of all users deleted
+              properties:
+                status:
+                  type: string
+                  default: success
+                message:
+                    $ref: '#/components/schemas/User'
+        "400":
+          description: internal error
+          content:
+            application/json:
+              description: when error return status error and message of error
+              type: object
+              properties:
+                status:
+                  type: string
+                  default: error
+                message:
+                  type: string
+                  description: Error message
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: Id generated by mongo
+        first_name:
+          type: string
+          description: Fist name of the user
+        last_name:
+          type: string
+          description: Las name of the user
+        email:
+          type: string
+          format: email
+          description: email of the user
+        password:
+          type: string
+          format: password
+          description: encripted password of the user
+        age:
+          type: number
+          description: age of the user
+        cart:
+          $ref: '../../products/cart.yml#/components/schemas/Cart'
+        role:
+          type: string
+          enum:
+            - USER
+            - ADMIN
+            - PUBLIC
+            - PREMIUM
+          description: Role of the user, this give permission to certain actions
+        resetLink:
+          type: string
+          description: generated link for the user to change his password
+        documents:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: identification of the type of document
+              refereance:
+                type: string
+                description: route of the document location
+          description: documents of identification of the user, used to get PREMIUM role
+          last_connection:
+            type: string
+            format: date
+            description: las time the user logged
+      required: 
+        - first_name
+        - last_name
+        - email
+        - password
+        - age
+      example:
+        _id: 65f54c17d38f2e0f51384963
+        first_name: Coder
+        last_name: Admin
+        email: adminCoder@coder.com
+        password: $2b$10$k1jvw53Jxqj7Aoku6g7VSOhkhbubcD7V5zOSuChL.SHPgJlCt2J.K
+        role: ADMIN
+        cart: 664df22a15e0c14a5e07daca
+        last_connection: 2024-07-10T20:35:43.419+00:00
+        documents: [
+          {
+            name: bankProof,
+            reference: uploads/65f54c17d38f2e0f51384963/bankProof-0fd9eae7-62de-4bb3-b40c-3eda75c019c8.pdf,
+            _id: 668781682c173da1c0be7885
+          },
+          {
+            name: identification,
+            reference: uploads/65f54c17d38f2e0f51384963/identification-1de417bf-df27-4953-a38f-e9bf3c4f996e.pdf,
+            _id: 668781682c173da1c0be7887
+          },
+          {
+            name: proofAdress,
+            reference: uploads/65f54c17d38f2e0f51384963/proofAdress-c805e550-9730-476e-bf9c-e8714d601517.pdf,
+            _id: 668781682c173da1c0be7889
+          }
+        ]
+
+      

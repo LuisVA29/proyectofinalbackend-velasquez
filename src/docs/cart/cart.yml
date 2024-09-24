@@ -1,0 +1,307 @@
+paths:
+  /api/carts/{cid}:
+    get:
+      summary: get cart products
+      tags:
+        - Cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id of the cart
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    product:
+                      $ref: "../../products/products.yml#/components/schemas/Product"
+                      example:
+                        _id: 66466eaf30b04d3dd1c6bd38
+                        title: Tomate
+                        description: "El tomate es rico en minerales esenciales, que nos ayudan a sentirnos fuertes y con energía."
+                        price: 587
+                        thumbnail: [
+                          "https://firebasestorage.googleapis.com/v0/b/tienda-mastergym.appspot.com/o/Prouctmanager%2Ftomate.jpeg?alt=media&token=80320653-1e2b-41df-b737-02cb2996ac9e"
+                        ]
+                        stock: 98
+                        code: 578921
+                        status: true
+                        category: Verdura
+                        owner: 662d90d4fba2929ccc5ac612
+        "400":
+          description: error server side
+  /api/carts/{cid}/product/{pid}:
+    post:
+      summary: Add product to cart, if already exist will increment quantity
+      tags:
+        - Cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id of cart
+        - name: pid
+          in: path
+          required: true
+          description: id of product
+      responses:
+        "200":
+          description: returns cart object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id: 
+                    type: string
+                    description: mongoid of the cart
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product: 
+                          type: string
+                          description: mongoid of the product
+                        quantity:
+                          type: number
+                          description: amount o items on the cart
+                        _id: 
+                          type: string
+                          description: mongo id of the object in the cart (not really used, just refrence)
+        "400":
+          description: internal error
+  /api/carts/{cartid}/product/{pid}:
+    delete:
+      summary: delete a product from the cart
+      tags:
+        - Cart
+      parameters:
+        - name: cartid
+          in: path
+          required: true
+          description: id of cart
+        - name: pid
+          in: path
+          required: true
+          description: id of product
+        - name: quantity
+          in: query
+          schema:
+            type: number
+          required: true
+          description: quantity that is gonna be set
+      responses:
+        "200":
+          description: returns acknowledged of the deletion of the product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    description: status if the deleation success
+                    defualt: success
+                  acknowledged:
+                    type: boolean
+                    description: acknowledgedment of moongose that the produt had been deleted
+                  productId:
+                    type: string
+                    description: id of the product deleted
+                  cartId:
+                    type: string
+                    description: id of the cart that the product have been deleted
+        "400":
+          description: internal error
+  /api/carts/{cartid}/product/{productid}:
+    put:
+      summary: delete a product from the cart
+      tags:
+        - Cart
+      parameters:
+        - name: cartid
+          in: path
+          required: true
+          description: id of cart
+        - name: productid
+          in: path
+          required: true
+          description: id of product
+      responses:
+        "200":
+          description: return the cart of the product modi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id: 
+                    type: string
+                    description: mongoid of the cart
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product: 
+                          type: string
+                          description: mongoid of the product
+                        quantity:
+                          type: number
+                          description: amount o items on the cart
+                        _id: 
+                          type: string
+                          description: mongo id of the object in the cart (not really used, just refrence)
+        "400":
+          description: internal error
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Purhsase de cart id given, this remove stock of the product and create a ticket object
+      tags:
+        - Cart
+      parameters:
+        - name: cartid
+          in: path
+          required: true
+          description: id of cart
+        - name: productid
+          in: path
+          required: true
+          description: id of product
+      responses:
+        "200":
+          description: return the ticket of the products purchased
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        "400":
+          description: internal error
+  /api/carts/{ccid}:
+    delete:
+      summary: Delete all the products in the cart
+      tags:
+        - Cart
+      parameters:
+        - name: ccid
+          in: path
+          required: true
+          description: id of cart
+      responses:
+        "200":
+          description: return the ticket of the products purchased
+          content:
+            application/json:
+              schema:
+                type: string
+                description: message that indicates that cart was deleted
+        "400":
+          description: internal error
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: mongo id of the cart
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                $ref: '../../products/products.yml#/components/schemas/Product'
+              quantity:
+                type: number
+                description: number of products in the cart
+              _id:
+                type: string
+                description: id of the added product
+      example:
+        _id: 664df22a15e0c14a5e07daca
+        products: [
+          {
+            product: {
+                      _id: 66466eaf30b04d3dd1c6bd38,
+                      title: Tomate,
+                      description: "El tomate es rico en minerales esenciales, que nos ayudan a sentirnos fuertes y con energía.",
+                      price: 587,
+                      thumbnail: [
+                        "https://firebasestorage.googleapis.com/v0/b/tienda-mastergym.appspot.com/o/Prouctmanager%2Ftomate.jpeg?alt=media&token=80320653-1e2b-41df-b737-02cb2996ac9e"
+                      ],
+                      stock: 98,
+                      code: 578921,
+                      status: true,
+                      category: Verdura,
+                      owner: 662d90d4fba2929ccc5ac612
+            },
+            quantity: 2,
+            _id: 667c8f3ddc5a9cc8785ffee5
+          }
+        ]
+    Ticket:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: mongo id of the cart
+        code:
+          type: string
+          format: uuid
+          description: internal code of the ticket
+        amount:
+          type: number
+          description: Total amount of the purchase
+        purchase_datetime:
+          type: string
+          format: date-time
+          description: date that the purchase was made
+        purchaser:
+          type: string
+          format: email
+          description: email of the person how purchase it
+        productsPurchased:
+          type: array
+          items:
+            type: object
+            properties:
+              product: 
+                $ref: '../../products/products.yml#/components/schemas/Product'
+              quantity:
+                type: number
+                description: number of products in the cart
+              _id:
+                type: string
+                description: id of the added product
+      required:
+        - code
+        - amount
+        - purchaser
+        - productsPurchased
+        - purchase_datetime
+      example:
+          code: 78937447-ff71-4ab1-8174-9828207d6b4d
+          amount: 100,
+          purchase_datetime: 2024-07-10T16:54:32.418Z,
+          purchaser: adminCoder@coder.com,
+          productsPurchased: [
+              { product: {
+              _id: 65cea810cf91d8472f0bfbcb,
+              title: Calabacín,
+              description: El calabacín es una de las hortalizas que menor aporte calórico tienen. Tiene un alto contenido en agua, lo que lo hace una hortaliza ideal en las dietas de adelgazamiento y con un alto poder diurético.,
+              price: 50,
+              thumbnail: [ https://firebasestorage.googleapis.com/v0/b/tienda-mastergym.appspot.com/o/Prouctmanager%2Fcalabacin.jpeg?alt=media&token=f030f387-c952-4793-b740-8f57ba70c152],
+              stock: 30,
+              code: 785268,
+              status: true,
+              category: Verdura },
+            quantity: 2,
+            _id: 668ebb2548eec0175328ba4c }]
+          _id: 668ebcc8f457b0509b534323
